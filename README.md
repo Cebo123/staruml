@@ -1,2 +1,2 @@
 # staruml-asi
-Extensions for StarUML
+Automation tasks for StarUML
