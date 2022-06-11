@@ -1,0 +1,17 @@
+{
+  "name": "mateo.asi",
+  "title": "ASI",
+  "description": "Automation of ASI tasks",
+  "homepage": "https://github.com/mateo-ceballos/staruml-asi",
+  "version": "0.1.0",
+  "keywords": ["ASI"],
+  "author": {
+    "name": "Mateo Ceballos",
+    "email": "mceballoscolombo@gmail.com",
+    "url": "https://www.instagram.com/mateoceballos03/"
+  },
+  "license": "MIT",
+  "engines": {
+    "staruml": ">=3.0.0"
+  }
+}
