@@ -1,21 +1,45 @@
+/**
+ * main.js is the entry point to be executed when StarUML is started
+ * init() function will be called when the extension is loaded.
+ */
+
+
 const TEXTNOTE = "Los metodos de seteo aplican a todas las clases"
 
+/**
+ * Returns a string with it's first letter as upper case.
+ * @param {string} _string The initial string which first letter should be upper case.
+ * @returns {string} The string with it's first letter as upper case.
+ */
 function firstUpperCase (_string) {
   if (_string.length > 0) {
-    return _string[0].toUpperCase() + _string.substr(1, _string.length - 1)
+    return _string[0].toUpperCase() + _string.slice(1, _string.length - 1)
   }
   return ''
 }
 
+/**
+ * Returns a string with it's first letter as lower case.
+ * @param {string} _string The initial string which first letter should be lower case.
+ * @returns {string} The string with it's first letter as lower case.
+ */
 function firstLowerCase (_string)
 {
   if (_string.length > 0) {
-    return _string[0].toLowerCase() + _string.substr(1, _string.length - 1)
+    return _string[0].toLowerCase() + _string.slice(1, _string.length - 1)
   }
   return ''
 }
 
-// Nature includes operations and attributes
+
+/**
+ * Check whether a class already contains an operation or attribute
+ * Nature includes operations and attributes.
+ * @param {object} _class 
+ * @param {string} nameToSearch The name of the nature that will be searched.
+ * @param {boolean} isOperation If it's true this function will search for an operarion. Otherwise it'll search for an attribute.
+ * @returns {boolean} Whether the class already contained the nature.
+ */
 function classContainsNature(_class, nameToSearch, isOperation = true)
 {
   // Get operations or attributes
@@ -38,6 +62,13 @@ function classContainsNature(_class, nameToSearch, isOperation = true)
   return false
 }
 
+/**
+ * Add one nature to a class
+ * Nature includes operations and attributes.
+ * @param {object} _class The class to add the nature.
+ * @param {string} nameToAdd The name of the nature that will be added.
+ * @param {boolean} isOperation If it's true this function will search for an operarion. Otherwise it'll search for an attribute.
+ */
 function addNature(_class, nameToAdd, isOperation = true)
 {
   if (!classContainsNature(_class, nameToAdd, isOperation))
@@ -75,16 +106,27 @@ function addNature(_class, nameToAdd, isOperation = true)
     }
 }
 
-function addAssociationNature (classToAddNature, classToGetName)
+
+/**
+ * Add the nature for an association
+ * Nature includes operations and attributes.
+ * @param {object} classToAddNature The class to add the nature.
+ * @param {object} classAssociated The associated class.
+ */
+function addAssociationNature (classToAddNature, classAssociated)
 {
   //  Add atribute
-  addNature(classToAddNature, `${firstLowerCase(classToGetName.name)}: ${firstUpperCase(classToGetName.name)}`, false)
+  addNature(classToAddNature, `${firstLowerCase(classAssociated.name)}: ${firstUpperCase(classAssociated.name)}`, false)
   // Add operation
-  addNature(classToAddNature, `conocer${firstUpperCase(classToGetName.name)}`)
+  addNature(classToAddNature, `conocer${firstUpperCase(classAssociated.name)}`)
 }
 
 
-
+/**
+ * Get the view class object of a class.
+ * @param {object} _class The class from which to get the view class.
+ * @returns The view class of the class.
+ */
 function getViewClass(_class)
 {
   // Get all classView objects
@@ -100,6 +142,11 @@ function getViewClass(_class)
   return null
 }
 
+
+/**
+ * Adds the methods crear and mostrar for all the classes.
+ * @returns {null} Returns to exit the function.
+ */
 function handleCrearMostrar () {
 
   // Get model project object
@@ -115,9 +162,9 @@ function handleCrearMostrar () {
 
   // Add the operations foreach class
   for (let i = 0; i < classes.length; i++) {
-    
     var _class = classes[i]
 
+    app.toast.info(typeof _class)
     addNature(_class, "crear")
     addNature(_class, "mostrar")
     
@@ -126,6 +173,11 @@ function handleCrearMostrar () {
   app.toast.info("crear() mostrar(): Finalizado")
 }
 
+
+/**
+ * Adds the accesors for the class with less attribute and a note by its side.
+ * @returns {null} Returns to exit the function.
+ */
 function handleSeteo ()
 {
   // Get model project object
@@ -205,6 +257,10 @@ function handleSeteo ()
   app.toast.info("Metodos seteo: Finalizado")
 }
 
+
+/**
+ * Adds all the associations attributes and methods for all the classes in the project.
+ */
 function handleAssociations ()
 {
   // Get associations (it includes associations, aggregations and compositions. It doesnt include inheritance)
@@ -231,6 +287,10 @@ function handleAssociations ()
   app.toast.info("Asociaciones: Finalizado")
 }
 
+
+/**
+ * init() function will be called when the extension is loaded.
+ */
 function init () 
 {
   app.commands.register("ASI:crear-mostrar", handleCrearMostrar)
