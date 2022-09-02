@@ -1,0 +1,6 @@
+{
+    "cmdctrl-1": "ASI:crear-mostrar",
+    "cmdctrl-2": "ASI:seteo",
+    "cmdctrl-3": "ASI:associations",
+    "cmdctrl-4": "ASI:notViewed"
+}
