@@ -160,10 +160,11 @@ function addAssociationNature (classToAddNature, classAssociated)
  * @param {string} type The type of the view object such as "@UMLClassView".
  * @returns The corresponding view object, if it isn't found returns null.
  */
-function getViewObject(modelObject, type)
+function getViewObject(modelObject)
 {
-  // Get all classView objects
-  var objectViews = app.repository.select(type)
+  // Get all objectView objects
+  viewType = `@${modelObject.constructor.name}View`
+  var objectViews = app.repository.select(viewType)
 
   // Search for the corresponding classView
   for (let i = 0; i < objectViews.length; i++) 
@@ -182,7 +183,7 @@ function getViewObject(modelObject, type)
  */
 function deleteNotViewedObjects(modelType)
 {
-  // Get classes in the project
+  // Get objects in the project
   var allObjects = app.repository.select(modelType)
   if (allObjects.length == 0)
   {
@@ -192,9 +193,9 @@ function deleteNotViewedObjects(modelType)
   notViewedObjects = []
   for (let i = 0; i < allObjects.length; i++)
   {
-    _object = allObjects[i]
+    const _object = allObjects[i]
 
-    if (getViewObject(_object, modelType + "View") == null)
+    if (getViewObject(_object) == null)
     {
       notViewedObjects.push(_object)
     }
@@ -297,7 +298,7 @@ function handleSeteo ()
   {
     // Add note
     var diagram = app.repository.select("@UMLClassDiagram")
-    var viewClass = getViewObject(lessAttributesClass, "@UMLClassView")
+    var viewClass = getViewObject(lessAttributesClass)
     if (diagram.length == 0)
     {
       app.toast.error("No hay un diagrama de clases en el proyecto")
@@ -369,16 +370,36 @@ function handleNotViewed ()
 }
 
 /**
+ * Set auto resize to true for all clases.
+ */
+function handleAutoResize ()
+{
+  var allObjects = app.repository.select("@UMLClass")
+  if (allObjects.length == 0)
+  {
+    return
+  }
+
+  for (let i = 0; i < allObjects.length; i++) {
+    const _viewObject = getViewObject(allObjects[i])
+    app.engine.setProperty(_viewObject, 'autoResize', true)
+  }
+
+  app.toast.info("Activar auto resize: Finalizado")
+}
+
+/**
  * Execute all the other handles
  */
 function handleDoEverything ()
 {
   // Not viewed model object must be deleted first
   handleNotViewed ()
-  
+
   handleCrearMostrar ()
   handleSeteo ()
   handleAssociations ()
+  handleAutoResize ()
 }
 
 //#endregion
@@ -392,6 +413,7 @@ function init ()
   app.commands.register("ASI:seteo", handleSeteo)
   app.commands.register("ASI:associations", handleAssociations)
   app.commands.register("ASI:notViewed", handleNotViewed)
+  app.commands.register("ASI:autoResize", handleAutoResize)
   app.commands.register("ASI:doEverything", handleDoEverything)
 }
 

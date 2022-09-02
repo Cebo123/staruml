@@ -13,6 +13,7 @@
               { "label": "Metodos Seteo", "id": "tool.metodosseteo" ,"command": "ASI:seteo" },
               { "label": "Asociaciones", "id": "tool.asociaciones" ,"command": "ASI:associations" },
               { "label": "Eliminar objetos no vistos", "id": "tool.notViewed" ,"command": "ASI:notViewed" },
+              { "label": "Activar auto resize", "id": "tool.autoResize" ,"command": "ASI:autoResize" },
               { "label": "Hacer todo", "id": "tool.doEverything" ,"command": "ASI:doEverything" }
             ]
           }
