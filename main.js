@@ -152,6 +152,8 @@ function addAssociationNature (classToAddNature, classAssociated)
 
 //#endregion
 
+//#region ViewUtils
+
 /**
  * Returns the view object of a model object.
  * @param {object} modelObject The model object from which to get the view object.
@@ -174,6 +176,34 @@ function getViewObject(modelObject, type)
   return null
 }
 
+/**
+ * Delete all the model objects of a type which don't have a view object
+ * @param {string} modelType The type of the model objects to be deleted such as "@UMLClass".
+ */
+function deleteNotViewedObjects(modelType)
+{
+  // Get classes in the project
+  var allObjects = app.repository.select(modelType)
+  if (allObjects.length == 0)
+  {
+    return
+  }
+
+  notViewedObjects = []
+  for (let i = 0; i < allObjects.length; i++)
+  {
+    _object = allObjects[i]
+
+    if (getViewObject(_object, modelType + "View") == null)
+    {
+      notViewedObjects.push(_object)
+    }
+  }
+  
+  app.engine.deleteElements(notViewedObjects, [])
+}
+
+//#endregion
 
 //#region Handles
 
@@ -213,9 +243,6 @@ function handleCrearMostrar () {
  */
 function handleSeteo ()
 {
-  // Get model project object
-  var project = app.project.getProject()
-
   // Get classes in the project
   var classes = app.repository.select("@UMLClass")
   if (classes.length == 0)
@@ -333,9 +360,12 @@ function handleAssociations ()
  */
 function handleNotViewed ()
 {
-  app.toast.info("handleNotViwed");
+  // The type of objects which will be deleted
+  objectTypes = ["@UMLClass", "@UMLAssociation", "@UMLGeneralization", "@UMLUseCase", "@UMLActor"]
 
-  
+  objectTypes.forEach(deleteNotViewedObjects)
+
+  app.toast.info("No vistos: Finalizado")
 }
 
 //#endregion
