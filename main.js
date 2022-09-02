@@ -3,34 +3,55 @@
  * init() function will be called when the extension is loaded.
  */
 
+//#region Constants
 
 const TEXTNOTE = "Los metodos de seteo aplican a todas las clases"
 
+//#endregion
+
+//#region StringUtils
+
 /**
- * Returns a string with it's first letter as upper case.
- * @param {string} _string The initial string which first letter should be upper case.
+ * Checks whether a string begins with a letter.
+ * @param {string} _string The string to check.
+ * @return {boolean} True if the string begins with a letter, false otherwise.
+ */
+function startsWithLetter (_string)
+{
+  if (new RegExp(`^[a-zA-Z]`).test(_string))
+  {
+    return true
+  }
+  return false
+}
+
+/**
+ * Returns a string with it's first letter as upper or lower case, ff it doesn't start with a letter it returns the same string.
+ * @param {string} _string The initial string which first letter should be upper or lower case.
+ * @param {boolean} upper If true, the string returned will have it's first letter upper case, otherwise it'll be lower case.
  * @returns {string} The string with it's first letter as upper case.
  */
-function firstUpperCase (_string) {
+function firstUpperOrLowerCase (_string, upper = true) {
+  if (!startsWithLetter(_string))
+  {
+    return _string
+  }
+
   if (_string.length > 0) {
-    return _string[0].toUpperCase() + _string.slice(1, _string.length - 1)
+    if (upper)
+    {
+      return _string[0].toUpperCase() + _string.slice(1)
+    } else
+    {
+      return _string[0].toLowerCase() + _string.slice(1)
+    }
   }
   return ''
 }
 
-/**
- * Returns a string with it's first letter as lower case.
- * @param {string} _string The initial string which first letter should be lower case.
- * @returns {string} The string with it's first letter as lower case.
- */
-function firstLowerCase (_string)
-{
-  if (_string.length > 0) {
-    return _string[0].toLowerCase() + _string.slice(1, _string.length - 1)
-  }
-  return ''
-}
+//#endregion
 
+//#region NatureUtils
 
 /**
  * Check whether a class already contains an operation or attribute
@@ -115,33 +136,46 @@ function addNature(_class, nameToAdd, isOperation = true)
  */
 function addAssociationNature (classToAddNature, classAssociated)
 {
+  associatedClassName = classAssociated.name
+
+  if (!startsWithLetter(associatedClassName))
+  {
+    app.toast.error(`La clase '${associatedClassName}' deberia empezar con una letra. Los atributos y metodos de sus asociaciones no serán agregados`)
+    return
+  }
+
   //  Add atribute
-  addNature(classToAddNature, `${firstLowerCase(classAssociated.name)}: ${firstUpperCase(classAssociated.name)}`, false)
+  addNature(classToAddNature, `${firstUpperOrLowerCase(associatedClassName, false)}: ${firstUpperOrLowerCase(associatedClassName)}`, false)
   // Add operation
-  addNature(classToAddNature, `conocer${firstUpperCase(classAssociated.name)}`)
+  addNature(classToAddNature, `conocer${firstUpperOrLowerCase(associatedClassName)}`)
 }
 
+//#endregion
 
 /**
- * Get the view class object of a class.
- * @param {object} _class The class from which to get the view class.
- * @returns The view class of the class.
+ * Returns the view object of a model object.
+ * @param {object} modelObject The model object from which to get the view object.
+ * @param {string} type The type of the view object such as "@UMLClassView".
+ * @returns The corresponding view object, if it isn't found returns null.
  */
-function getViewClass(_class)
+function getViewObject(modelObject, type)
 {
   // Get all classView objects
-  var classViews = app.repository.select("@UMLClassView")
+  var objectViews = app.repository.select(type)
+
   // Search for the corresponding classView
-  for (let i = 0; i < classViews.length; i++) 
+  for (let i = 0; i < objectViews.length; i++) 
   {
-    if (classViews[i].model._id == _class._id)
+    if (objectViews[i].model._id == modelObject._id)
     {
-      return classViews[i]
+      return objectViews[i]
     }
   }
   return null
 }
 
+
+//#region Handles
 
 /**
  * Adds the methods crear and mostrar for all the classes.
@@ -164,7 +198,6 @@ function handleCrearMostrar () {
   for (let i = 0; i < classes.length; i++) {
     var _class = classes[i]
 
-    app.toast.info(typeof _class)
     addNature(_class, "crear")
     addNature(_class, "mostrar")
     
@@ -208,9 +241,16 @@ function handleSeteo ()
   // Add opperations
   for (let i = 0; i < attributes.length; i++) 
   {
-    var _attribute = attributes[i]
-    addNature(lessAttributesClass, `tomar${firstUpperCase(_attribute.name)}`)
-    addNature(lessAttributesClass, `mostrar${firstUpperCase(_attribute.name)}`)
+    var _attributeName = attributes[i].name
+
+    if (!startsWithLetter(_attributeName))
+    {
+      app.toast.error(`El atributo '${_attributeName}' de la clase '${lessAttributesClass.name}' debería empezar con una letra. No se agregarán sus metodos de seteo`)
+      continue
+    }
+
+    addNature(lessAttributesClass, `tomar${firstUpperOrLowerCase(_attributeName)}`)
+    addNature(lessAttributesClass, `mostrar${firstUpperOrLowerCase(_attributeName)}`)
   }
 
   // Check that there isn't a note already
@@ -230,7 +270,7 @@ function handleSeteo ()
   {
     // Add note
     var diagram = app.repository.select("@UMLClassDiagram")
-    var viewClass = getViewClass(lessAttributesClass, project)
+    var viewClass = getViewObject(lessAttributesClass, "@UMLClassView")
     if (diagram.length == 0)
     {
       app.toast.error("No hay un diagrama de clases en el proyecto")
@@ -295,8 +335,10 @@ function handleNotViewed ()
 {
   app.toast.info("handleNotViwed");
 
-
+  
 }
+
+//#endregion
 
 /**
  * init() function will be called when the extension is loaded.
