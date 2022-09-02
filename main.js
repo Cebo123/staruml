@@ -368,6 +368,19 @@ function handleNotViewed ()
   app.toast.info("No vistos: Finalizado")
 }
 
+/**
+ * Execute all the other handles
+ */
+function handleDoEverything ()
+{
+  // Not viewed model object must be deleted first
+  handleNotViewed ()
+  
+  handleCrearMostrar ()
+  handleSeteo ()
+  handleAssociations ()
+}
+
 //#endregion
 
 /**
@@ -379,6 +392,7 @@ function init ()
   app.commands.register("ASI:seteo", handleSeteo)
   app.commands.register("ASI:associations", handleAssociations)
   app.commands.register("ASI:notViewed", handleNotViewed)
+  app.commands.register("ASI:doEverything", handleDoEverything)
 }
 
 exports.init = init
