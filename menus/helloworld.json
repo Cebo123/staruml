@@ -11,7 +11,8 @@
             [
               { "label": "crear() mostrar()", "id": "tool.crearmostrar" ,"command": "ASI:crear-mostrar" }, 
               { "label": "Metodos Seteo", "id": "tool.metodosseteo" ,"command": "ASI:seteo" },
-              { "label": "Asociaciones", "id": "tool.asociaciones" ,"command": "ASI:associations" }
+              { "label": "Asociaciones", "id": "tool.asociaciones" ,"command": "ASI:associations" },
+              { "label": "Eliminar objetos no vistos", "id": "tool.notViewed" ,"command": "ASI:notViewed" }
             ]
           }
         ]

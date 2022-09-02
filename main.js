@@ -289,6 +289,16 @@ function handleAssociations ()
 
 
 /**
+ * Delete model objects which don't have a view object.
+ */
+function handleNotViewed ()
+{
+  app.toast.info("handleNotViwed");
+
+
+}
+
+/**
  * init() function will be called when the extension is loaded.
  */
 function init () 
@@ -296,8 +306,7 @@ function init ()
   app.commands.register("ASI:crear-mostrar", handleCrearMostrar)
   app.commands.register("ASI:seteo", handleSeteo)
   app.commands.register("ASI:associations", handleAssociations)
-
-  // TODO: Delete model objects which don't have a view object
+  app.commands.register("ASI:notViewed", handleNotViewed)
 }
 
 exports.init = init
