@@ -5,5 +5,6 @@
     "cmdctrl-4": "ASI:notViewed",
     "cmdctrl-5": "ASI:autoResize",
     "cmdctrl-6": "ASI:doEverything",
+    "cmdctrl-7": "ASI:tipifyAttribute",
     "cmdctrl-8": "ASI:enumerateUseCases"
 }
