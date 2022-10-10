@@ -4,5 +4,6 @@
     "cmdctrl-3": "ASI:associations",
     "cmdctrl-4": "ASI:notViewed",
     "cmdctrl-5": "ASI:autoResize",
-    "cmdctrl-6": "ASI:doEverything"
+    "cmdctrl-6": "ASI:doEverything",
+    "cmdctrl-8": "ASI:enumerateUseCases"
 }

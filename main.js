@@ -6,6 +6,7 @@
 //#region Constants
 
 const TEXTNOTE = "Los metodos de seteo aplican a todas las clases"
+const X_OFFSET_TOLLERANCE = 80
 
 //#endregion
 
@@ -47,6 +48,30 @@ function firstUpperOrLowerCase (_string, upper = true) {
     }
   }
   return ''
+}
+
+/**
+ * Returns a string starting with a number
+ * @param {string} _string The initial string which will have a number added
+ * @param {Int} number The number which will be added to the string
+ * @returns {string} The string with the number
+ */
+function addNumber (_string, number) {
+  return `${number}. ${_string}`
+}
+
+/**
+ * Returns a string with no number if it already had it
+ * @param {string} _string The string to check whether it already has a number
+ * @returns {string} The string without the number
+ */
+function checkNumberAlreadyAdded (_string){
+  dotIndex = _string.indexOf(".")
+  if (dotIndex == -1){
+    return _string
+  } else {
+    return _string.substring(dotIndex + 2)
+  }
 }
 
 //#endregion
@@ -202,6 +227,70 @@ function deleteNotViewedObjects(modelType)
   }
   
   app.engine.deleteElements(notViewedObjects, [])
+}
+
+/**
+ * Returns the model objects sorted from up to down, from left to right
+ * @param {object} objects The objects which will be sorted
+ * @returns The sorted objects
+ */
+function sortByPossition (objects) 
+{
+  // positionedObject := {object, xPos, yPos}
+  // ListObjets will be of the form [ positionedObject1, positionedObject2, ... ]
+  var listObjects = Array(objects.length)
+  // Columns will be of the form [ [ positionedObject1, positionedObject2, ... ], [positionedObject3, positionedObject4, ...], ... ]
+  var columns = []
+
+  for (let i = 0; i < objects.length; i++) {
+    const object = objects[i];
+    const viewObject = getViewObject(objects[i])
+    const xPos = viewObject.mainRect.x1
+    const yPos = viewObject.mainRect.y1
+    listObjects[i] = {object: object, xPos: xPos, yPos: yPos}
+  }
+
+  // Get columns
+  for (let i = 0; i < listObjects.length; i++) {
+    const object = listObjects[i];
+
+    // If the column isn't already added: -1. Otherwise the index of the column
+    columnIndex = -1
+    for (let j = 0; j < columns.length; j++) {
+      const column = columns[j];
+      if (Math.abs(column[0].xPos - object.xPos) <= X_OFFSET_TOLLERANCE) {
+        columnIndex = j
+      }
+    }
+
+    if (columnIndex == -1) {
+      columns.push( [ object ] )
+    } else {
+      columns[columnIndex].push( object )
+    }
+  }
+
+  // Sort each column
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i];
+    column.sort(function(a,b){
+      return a.yPos - b.yPos
+    })
+  }
+
+  // Sort columns
+  columns.sort(function(a,b){
+    return a[0].xPos - b[0].xPos
+  })
+
+  listObjects = columns.flat()
+  var finalList = Array(objects.length)
+  for (let i = 0; i < listObjects.length; i++) {
+    const object = listObjects[i];
+    finalList[i] = object.object
+  }
+
+  return finalList
 }
 
 //#endregion
@@ -374,14 +463,14 @@ function handleNotViewed ()
  */
 function handleAutoResize ()
 {
-  var allObjects = app.repository.select("@UMLClass")
-  if (allObjects.length == 0)
+  var classes = app.repository.select("@UMLClass")
+  if (classes.length == 0)
   {
     return
   }
 
-  for (let i = 0; i < allObjects.length; i++) {
-    const _viewObject = getViewObject(allObjects[i])
+  for (let i = 0; i < classes.length; i++) {
+    const _viewObject = getViewObject(classes[i])
     app.engine.setProperty(_viewObject, 'autoResize', true)
   }
 
@@ -402,6 +491,25 @@ function handleDoEverything ()
   handleAutoResize ()
 }
 
+/**
+ * Adds a number to the name of all the use cases.
+ * Starting from up to down and from left to right
+ */
+function handleEnumerateUseCases ()
+{
+  var useCases = app.repository.select("@UMLUseCase")
+
+  useCases = sortByPossition(useCases)
+
+  for (let i = 0; i < useCases.length; i++) {
+    const useCase = useCases[i]
+    const useCaseName = checkNumberAlreadyAdded(useCase.name)
+    app.engine.setProperty(useCase, 'name', addNumber(useCaseName, i+1))
+  }
+
+  app.toast.info("Enumerar casos de uso: Finalizado")
+}
+
 //#endregion
 
 /**
@@ -415,6 +523,8 @@ function init ()
   app.commands.register("ASI:notViewed", handleNotViewed)
   app.commands.register("ASI:autoResize", handleAutoResize)
   app.commands.register("ASI:doEverything", handleDoEverything)
+  // TODO: Tipify atribute
+  app.commands.register("ASI:enumerateUseCases", handleEnumerateUseCases)
 }
 
 exports.init = init
