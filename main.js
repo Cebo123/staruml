@@ -6,6 +6,7 @@
 //#region Constants
 
 const TEXTNOTE = "Los metodos de seteo aplican a todas las clases"
+// Tolerance for use cases enumeration
 const X_OFFSET_TOLLERANCE = 80
 
 //#endregion
@@ -409,7 +410,7 @@ function handleSeteo ()
       return
     }
     var nearPossition = getNearPossition(viewClass)
-    var options =
+    var noteOptions =
     {
       id: "Note", 
       parent: diagram[0]._parent,
@@ -419,8 +420,18 @@ function handleSeteo ()
       x2: nearPossition.x2,
       y2: nearPossition.y2
     }
-    var note = app.factory.createModelAndView(options)
+    var note = app.factory.createModelAndView(noteOptions)
     app.engine.setProperty(note, "text", TEXTNOTE)
+
+    var noteLinkOptions =
+    {
+      id: "NoteLink",
+      parent: diagram[0]._parent,
+      diagram: diagram[0],
+      tailView: viewClass,
+      headView: note,
+    }
+    var noteLink = app.factory.createModelAndView(noteLinkOptions)
   }
 
   app.toast.info("Metodos seteo: Finalizado")
@@ -501,6 +512,7 @@ function handleDoEverything ()
   handleSeteo ()
   handleAssociations ()
   handleAutoResize ()
+  handlePrivateAtributes ()
 }
 
 /**
@@ -590,6 +602,29 @@ function handleEnumerateUseCases ()
   app.toast.info("Enumerar casos de uso: Finalizado")
 }
 
+/**
+ * Makes every atribute of every class private
+ */
+function handlePrivateAtributes (){
+  // Get classes
+  var classes = app.repository.select("@UMLClass")
+
+  for (let i = 0; i < classes.length; i++) {
+    const _class = classes[i];
+
+    // Get atributes
+    var atributes = app.repository.select(`${_class.name}::@UMLAttribute`)
+    for (let j = 0; j < atributes.length; j++) {
+      const atribute = atributes[j];
+      
+      // Set private
+      app.engine.setProperty(atribute, "visibility", "private")
+    }
+  }
+
+  app.toast.info("Hacer atributos privados: Finalizado")
+}
+
 //#endregion
 
 /**
@@ -603,9 +638,10 @@ function init ()
   app.commands.register("ASI:notViewed", handleNotViewed)
   app.commands.register("ASI:autoResize", handleAutoResize)
   app.commands.register("ASI:doEverything", handleDoEverything)
-  // TODO: Tipify attribute
   app.commands.register("ASI:tipifyAttribute", handleTipifyAttribute)
   app.commands.register("ASI:enumerateUseCases", handleEnumerateUseCases)
+  // TODO: Make atributes private
+  app.commands.register("ASI:privateAtributes", handlePrivateAtributes)
 }
 
 exports.init = init

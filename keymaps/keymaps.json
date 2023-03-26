@@ -6,5 +6,6 @@
     "cmdctrl-5": "ASI:autoResize",
     "cmdctrl-6": "ASI:doEverything",
     "cmdctrl-7": "ASI:tipifyAttribute",
-    "cmdctrl-8": "ASI:enumerateUseCases"
+    "cmdctrl-8": "ASI:enumerateUseCases",
+    "cmdctrl-9": "ASI:privateAtributes"
 }

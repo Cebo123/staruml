@@ -16,7 +16,8 @@
               { "label": "Activar auto resize", "id": "tool.autoResize" ,"command": "ASI:autoResize" },
               { "label": "Hacer todo", "id": "tool.doEverything" ,"command": "ASI:doEverything" },
               { "label": "Tipificar atributo", "id": "tool.tipifyAttribute" ,"command": "ASI:tipifyAttribute" },
-              { "label": "Enumerar casos de uso", "id": "tool.enumerateUseCases" ,"command": "ASI:enumerateUseCases" }
+              { "label": "Enumerar casos de uso", "id": "tool.enumerateUseCases" ,"command": "ASI:enumerateUseCases" },
+              { "label": "Hacer atributos privados", "id": "tool.privateAtributes" ,"command": "ASI:privateAtributes" }
             ]
           }
         ]
